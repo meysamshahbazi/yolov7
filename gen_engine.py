@@ -58,7 +58,6 @@ class Detect(nn.Module):
         super(Detect, self).__init__()
         self.nc = nc  # number of classes
         self.no = nc + 5  # number of outputs per anchor
-        print(" anchors ", anchors)
         self.nl = len(anchors)  # number of detection layers
         self.na = len(anchors[0]) // 2  # number of anchors
         self.grid = [torch.zeros(1)] * self.nl  # init grid
@@ -367,21 +366,32 @@ yolo.eval()
 yolo.cuda()
 
 x = torch.ones(1, 3, 384, 640).cuda()
+if not os.path.isfile("model_trt.pth"):
+    model_trt = torch2trt(
+        yolo,
+        [x],
+        output_names = ["o0","o1","o2"],
+        fp16_mode=True,
+        log_level=trt.Logger.INFO,
+        max_workspace_size=(1 << 32),
+        max_batch_size=1,
+        use_onnx = False,
+    )
 
-model_trt = torch2trt(
-    yolo,
-    [x],
-    output_names = ["o0","o1","o2"],
-    fp16_mode=True,
-    log_level=trt.Logger.INFO,
-    max_workspace_size=(1 << 32),
-    max_batch_size=1,
-    use_onnx = False,
-)
+    torch.save(model_trt.state_dict(),  "model_trt.pth")
+    engine_file = "model_trt.engine"
+    with open(engine_file, "wb") as f:
+        f.write(model_trt.engine.serialize())
 
-torch.save(model_trt.state_dict(),  "model_trt.pth")
-engine_file = "model_trt.engine"
-with open(engine_file, "wb") as f:
-    f.write(model_trt.engine.serialize())
+    print("----------------------------------------------------")
+    print("TensorRT engine model seems to be exported!")
 
-    
+print("----------------------------------------------------")  
+ONNX_FILE_PATH = "yolov7.onnx"
+
+if not os.path.isfile(ONNX_FILE_PATH):
+    torch.onnx.export(yolo, (x), 
+                    ONNX_FILE_PATH, input_names=["x"], 
+                    output_names=["o0","o1","o2"], export_params=True)
+
+    print("ONNX model seems to be exported!")
