@@ -1,3 +1,6 @@
+# My fork!
+this fork is created in order to facilate generating tensorRT engine for yolo v7.
+
 # Official YOLOv7
 
 Implementation of paper - [YOLOv7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors](https://arxiv.org/abs/2207.02696)
