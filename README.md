@@ -1,5 +1,6 @@
 # My fork!
 this fork is created in order to facilate generating tensorRT engine for yolo v7.
+our aim is using yolov7 in TensorRt as implimented [here](https://github.com/meysamshahbazi/yo7trt)
 
 # Official YOLOv7
 

@@ -334,10 +334,10 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
 
 
 
-
+MODEL_NAME = 'yolov7-tiny'
 device = torch.device('cuda:0')
-model = Model("cfg/deploy/yolov7.yaml")#.to(device)
-weights = 'yolov7.pt'
+model = Model("cfg/deploy/"+MODEL_NAME+".yaml")#.to(device)
+weights = MODEL_NAME+".pt"#'yolov7.pt'
 state_dict = torch.load(weights)
 state_dict = state_dict['model'].state_dict()
 model.load_state_dict(state_dict)
@@ -387,7 +387,7 @@ if not os.path.isfile("model_trt.pth"):
     print("TensorRT engine model seems to be exported!")
 
 print("----------------------------------------------------")  
-ONNX_FILE_PATH = "yolov7.onnx"
+ONNX_FILE_PATH = MODEL_NAME+".onnx" #"yolov7.onnx"
 
 if not os.path.isfile(ONNX_FILE_PATH):
     torch.onnx.export(yolo, (x), 
